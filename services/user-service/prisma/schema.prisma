@@ -12,6 +12,15 @@ model User {
   name      String
   email     String   @unique
   phone     String?
+  avatar    String?  // Cloudinary image URL for profile picture
+  role      Role     @default(USER) // Enum for user roles
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+  RESTAURANT_OWNER
+  DELIVERY_PERSON
 }

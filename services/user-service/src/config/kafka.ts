@@ -1,22 +1,14 @@
-import { Request, Response } from 'express';
-import * as userService from '../services/user.service';
-import { successResponse, errorResponse } from '../utils/response';
+import { Kafka } from 'kafkajs';
 
-export const createUser = async (req: Request, res: Response) => {
-  try {
-    const user = await userService.createUser(req.body);
-    return successResponse(res, 'User created', user, 201);
-  } catch (err) {
-    return errorResponse(res, 'User creation failed', 500);
-  }
-};
+const kafka = new Kafka({
+  clientId: 'user-service',
+  brokers: [process.env.KAFKA_BROKER || 'localhost:9092'],
+});
 
-export const getUser = async (req: Request, res: Response) => {
-  try {
-    const user = await userService.getUserById(req.params.id);
-    if (!user) return errorResponse(res, 'User not found', 404);
-    return successResponse(res, 'User fetched', user, 200);
-  } catch (err) {
-    return errorResponse(res, 'Error fetching user', 500);
-  }
+export const producer = kafka.producer();
+export const consumer = kafka.consumer({ groupId: 'user-group' });
+
+export const startKafka = async () => {
+  await producer.connect();
+  await consumer.connect();
 };

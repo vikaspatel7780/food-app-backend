@@ -1,0 +1,25 @@
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+
+  auth-service:
+    build: ./services/auth-service
+    container_name: auth-service
+    restart: always
+    depends_on:
+      - db
+    env_file:
+      - ./services/auth-service/.env
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./services/auth-service:/app
+      - /app/node_modules  # Prevents container from using local node_modules
+    working_dir: /app
+    command: ["npm", "run", "dev"]
+
+volumes:
+  pgdata:
